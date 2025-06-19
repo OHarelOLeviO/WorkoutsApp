@@ -3,23 +3,43 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const WORKOUTS_KEY = 'workouts_table';
 const RUNS_KEY = 'runs_table';
 
-async function addItem(tableKey, newItem) {
+/** Find the smallest positive integer not in `usedIds` */
+const getNextId = (usedIds) => {
+    let id = 1;
+    while (usedIds.has(id)) id += 1;
+    return id;
+};
+
+async function addItem(tableKey, partialItem) {
     try {
-        const existing = await AsyncStorage.getItem(tableKey);
-        const data = existing ? JSON.parse(existing) : [];
-        data.push(newItem);
-        await AsyncStorage.setItem(tableKey, JSON.stringify(data));
-    } catch (error) {
-        console.error(`Failed to save item in ${tableKey}:`, error);
+        // 1. Load the existing rows (or empty array)
+        const existingJson = await AsyncStorage.getItem(tableKey);
+        const rows = existingJson ? JSON.parse(existingJson) : [];
+
+        // 2. Work out the next free id
+        const usedIds = new Set(rows.map((r) => r.id));
+        const id = getNextId(usedIds);
+
+        // 3. Push the completed row
+        const newItem = { id, ...partialItem };
+        rows.push(newItem);
+
+        // 4. Save back
+        await AsyncStorage.setItem(tableKey, JSON.stringify(rows));
+
+        // return newItem;          // ← handy if the caller wants to know the id
+    } catch (err) {
+        console.error(`Failed to save item in ${tableKey}:`, err);
+        throw err;
     }
 }
 
 async function getItems(tableKey) {
     try {
-        const data = await AsyncStorage.getItem(tableKey);
-        return data ? JSON.parse(data) : [];
-    } catch (error) {
-        console.error(`Failed to load items from ${tableKey}:`, error);
+        const json = await AsyncStorage.getItem(tableKey);
+        return json ? JSON.parse(json) : [];
+    } catch (err) {
+        console.error(`Failed to load items from ${tableKey}:`, err);
         return [];
     }
 }
