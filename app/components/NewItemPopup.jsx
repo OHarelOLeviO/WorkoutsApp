@@ -8,12 +8,14 @@ import {
     Button,
     ScrollView,
     Pressable,
+    TouchableOpacity
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { Storage } from '../utils/storage';
 import CustomAlert from '../components/CustomAlert';
+import Icon from 'react-native-vector-icons/Feather';
 
 const NewItemPopup = ({ visible, onClose }) => {
 
@@ -33,8 +35,13 @@ const NewItemPopup = ({ visible, onClose }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const okCallback = useRef(() => { });
 
-    const addExercise = () =>
+    const addExercise = () => {
         setExercises([...exercises, { name: '', reps: '', weight: '' }]);
+    }
+
+    const deleteExercise = (index) => {
+        setExercises(prev => prev.filter((_, i) => i !== index));
+    };
 
     const updateExercise = (idx, field, value) =>
         setExercises(prev =>
@@ -103,6 +110,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                     distance,
                     duration: formatDuration(durationSecs),
                     durationSecs,
+                    type: "run"
                 });
 
                 showAlert(
@@ -135,6 +143,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                     name: name.trim() || `Workout on ${formattedDate}`,
                     date: formattedDate,
                     exercises,
+                    type: "workout"
                 });
 
                 showAlert(
@@ -267,7 +276,11 @@ const NewItemPopup = ({ visible, onClose }) => {
                                             value={ex.weight}
                                             onChangeText={v => updateExercise(idx, 'weight', v)}
                                         />
-                                        {/* !!! Add Trash Can !!! */}
+                                        {idx > 0 && (
+                                            <TouchableOpacity onPress={() => deleteExercise(idx)} style={styles.trashButton}>
+                                                <Icon name="trash-2" size={20} color="black" />
+                                            </TouchableOpacity>
+                                        )}
                                     </View>
                                 ))}
                                 <Button title="+ Add Exercise" onPress={addExercise} />
@@ -363,6 +376,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 12,
     },
+    trashButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+    }
 });
 
 export default NewItemPopup;
