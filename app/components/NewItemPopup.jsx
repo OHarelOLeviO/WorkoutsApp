@@ -105,7 +105,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                 }
 
                 await Storage.addRun({
-                    name: name.trim() || `Run on ${formattedDate}`,
+                    name: name.trim(),
                     date: formattedDate,
                     distance,
                     duration: formatDuration(durationSecs),
@@ -115,10 +115,10 @@ const NewItemPopup = ({ visible, onClose }) => {
 
                 showAlert(
                     'Run Saved !',
-                    `${name.trim() || `Run on ${formattedDate}`} saved successfully.`,
+                    `${name.trim()} saved successfully.`,
                     () => {
                         resetState();
-                        onClose();
+                        onClose(true);
                     },
                 );
             } else {
@@ -140,7 +140,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                 }
 
                 await Storage.addWorkout({
-                    name: name.trim() || `Workout on ${formattedDate}`,
+                    name: name.trim(),
                     date: formattedDate,
                     exercises,
                     type: "workout"
@@ -148,10 +148,10 @@ const NewItemPopup = ({ visible, onClose }) => {
 
                 showAlert(
                     'Workout Saved !',
-                    `${name.trim() || `Workout on ${formattedDate}`} saved successfully.`,
+                    `${name.trim()} saved successfully.`,
                     () => {
                         resetState();
-                        onClose();
+                        onClose(true);
                     },
                 );
             }
@@ -168,7 +168,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <Text style={styles.title}>Add A New Item</Text>
 
-                        {/* TYPE SELECTION */}
+                        {/* Type selection */}
                         <View style={styles.typeRow}>
                             <Pressable
                                 style={styles.checkboxRow}
@@ -191,7 +191,9 @@ const NewItemPopup = ({ visible, onClose }) => {
                             </Pressable>
                         </View>
 
-                        {/* COMMON FIELDS */}
+                        {/* Common fields */}
+
+                        {/* Name */}
                         <TextInput
                             style={styles.input}
                             placeholder={itemType === 'run' ? 'Enter Run Name' : 'Enter Workout Name'}
@@ -199,7 +201,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                             onChangeText={setName}
                         />
 
-                        {/* DATE */}
+                        {/* Date */}
                         <Pressable onPress={() => setShowDatePicker(true)}>
                             <TextInput
                                 style={styles.input}
@@ -217,7 +219,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                             />
                         )}
 
-                        {/* RUN‑ONLY FIELDS */}
+                        {/* Run fields */}
                         {itemType === 'run' && (
                             <>
                                 <TextInput
@@ -228,7 +230,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                                     onChangeText={setDistance}
                                 />
 
-                                {/* DURATION (HH:MM:SS) */}
+                                {/* Duration (HH:MM:SS) */}
                                 <Pressable onPress={() => setShowDurationPicker(true)}>
                                     <TextInput
                                         style={styles.input}
@@ -251,7 +253,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                             </>
                         )}
 
-                        {/* WORKOUT‑ONLY FIELDS */}
+                        {/* Workout fields */}
                         {itemType === 'workout' && (
                             <>
                                 {exercises.map((ex, idx) => (
@@ -287,7 +289,7 @@ const NewItemPopup = ({ visible, onClose }) => {
                             </>
                         )}
 
-                        {/* ACTION BUTTONS */}
+                        {/* Action buttons */}
                         <View style={styles.buttonBar}>
                             <Button title="Save Item" onPress={handleSave} />
                             <Button
@@ -295,13 +297,13 @@ const NewItemPopup = ({ visible, onClose }) => {
                                 color="red"
                                 onPress={() => {
                                     resetState();
-                                    onClose();
+                                    onClose(false);
                                 }}
                             />
                         </View>
                     </ScrollView>
 
-                    {/* Custom Alert */}
+                    {/* Custom alert */}
                     <CustomAlert
                         visible={alertVisible}
                         title={alertTitle}

@@ -11,6 +11,5 @@ export default function Layout() {
                 </Stack>
             </RefreshProvider>
         </ThemeProvider>
-
     );
 }

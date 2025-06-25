@@ -16,7 +16,6 @@ import { LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width - 20;
 
-/* helper: convert dd/mm/yyyy → Date */
 const toDate = str => {
     const [d, m, y] = str.split('/').map(Number);
     return new Date(y, m - 1, d);
@@ -36,7 +35,6 @@ export default function GraphsPage() {
 
     const isFocused = useIsFocused();
 
-    /* fetch whenever page gains focus */
     useEffect(() => {
         (async () => {
             setRuns(await Storage.getRuns());
@@ -44,23 +42,19 @@ export default function GraphsPage() {
         })();
     }, [isFocused]);
 
-    /* unique lists */
     const distances = [...new Set(runs.map(r => r.distance))];
     const exerciseNames = [
         ...new Set(workouts.flatMap(w => w.exercises.map(e => e.name))),
     ];
 
-    /* ----- RUNS (sorted by date) ----- */
     const runsForDistance = runs
         .filter(r => r.distance === selectedDistance)
         .sort((a, b) => toDate(a.date) - toDate(b.date));
 
-    /* ----- WORKOUTS (sorted by date) ----- */
     const workoutsForExercise = workouts
         .filter(w => w.exercises.some(e => e.name === selectedExercise))
         .sort((a, b) => toDate(a.date) - toDate(b.date));
 
-    /* chart style */
     const chartConfig = {
         backgroundGradientFrom: backgroundColor,
         backgroundGradientTo: backgroundColor,
@@ -78,7 +72,8 @@ export default function GraphsPage() {
                 backgroundColor={backgroundColor}
             />
             <Text style={[styles.title, { color: textColor }]}>Graphs Page</Text>
-            {/* selectors */}
+
+            {/* Selectors */}
             <View style={styles.checkboxRow}>
                 <View style={styles.checkboxBox}>
                     <Checkbox
@@ -104,7 +99,7 @@ export default function GraphsPage() {
                 </View>
             </View>
 
-            {/* distance buttons */}
+            {/* Distance buttons */}
             {trackRuns && (
                 <View style={styles.buttonGroup}>
                     {distances.map(dist => (
@@ -122,7 +117,7 @@ export default function GraphsPage() {
                 </View>
             )}
 
-            {/* exercise buttons */}
+            {/* Exercise buttons */}
             {trackExercises && (
                 <View style={styles.buttonGroup}>
                     {exerciseNames.map(name => (
@@ -140,11 +135,11 @@ export default function GraphsPage() {
                 </View>
             )}
 
-            {/* RUN LINE CHART */}
+            {/* Runs line graph */}
             {trackRuns && selectedDistance && runsForDistance.length > 0 && (
                 <View style={styles.chartBox}>
                     <Text style={[styles.chartTitle, { color: textColor }]}>
-                        {selectedDistance} km – Time (hours)
+                        {selectedDistance} km - Time (hours)
                     </Text>
                     <LineChart
                         width={screenWidth}
@@ -167,11 +162,11 @@ export default function GraphsPage() {
                 </View>
             )}
 
-            {/* EXERCISE LINE CHART (reps & weight) */}
+            {/* Exercise lines graph (reps & weight) */}
             {trackExercises && selectedExercise && workoutsForExercise.length > 0 && (
                 <View style={styles.chartBox}>
                     <Text style={[styles.chartTitle, { color: textColor }]}>
-                        {selectedExercise} – Reps & Weight
+                        {selectedExercise} - Reps & Weight
                     </Text>
                     <LineChart
                         width={screenWidth}
@@ -187,7 +182,7 @@ export default function GraphsPage() {
                                                 0
                                             )
                                     ),
-                                    color: () => 'rgba(0,122,255,1)', // reps line
+                                    color: () => 'rgba(0,122,255,1)', // Reps line
                                     strokeWidth: 2,
                                 },
                                 {
@@ -198,7 +193,7 @@ export default function GraphsPage() {
                                                 0
                                             )
                                     ),
-                                    color: () => 'rgba(255,99,132,1)', // weight line
+                                    color: () => 'rgba(255,99,132,1)', // Weight line
                                     strokeWidth: 2,
                                 },
                             ],
@@ -218,11 +213,10 @@ export default function GraphsPage() {
     );
 }
 
-/* ----------------------- styles ----------------------- */
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: '10%',
+        paddingTop: '12%',
     },
     title: {
         fontSize: 30,

@@ -3,50 +3,51 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const WORKOUTS_KEY = 'workouts_table';
 const RUNS_KEY = 'runs_table';
 
-/* ---------- generic helpers ---------- */
+/* Getting the next avaliable id */
 const getNextId = (usedIds) => {
     let id = 1;
     while (usedIds.has(id)) id += 1;
     return id;
 };
 
-/** Insert */
+/* Insert */
 async function addItem(tableKey, partialItem) {
     const rows = await getItems(tableKey);
     const id = getNextId(new Set(rows.map(r => r.id)));
     const newItem = { id, ...partialItem };
     rows.push(newItem);
     await AsyncStorage.setItem(tableKey, JSON.stringify(rows));
-    return newItem;                 // so caller can know the id if needed
+    return newItem;
 }
 
-/** Read */
+/* Read */
 async function getItems(tableKey) {
     const json = await AsyncStorage.getItem(tableKey);
     return json ? JSON.parse(json) : [];
 }
 
-/** Update (replace by id) */
+/* Update (replace by id) */
 async function updateItem(tableKey, updated) {
     const rows = await getItems(tableKey);
     const newRows = rows.map(r => (r.id === updated.id ? updated : r));
     await AsyncStorage.setItem(tableKey, JSON.stringify(newRows));
 }
 
-/** Delete (filter out by id) */
+/* Delete (filter out by id) */
 async function deleteItem(tableKey, id) {
     const rows = await getItems(tableKey);
     const newRows = rows.filter(r => r.id !== id);
     await AsyncStorage.setItem(tableKey, JSON.stringify(newRows));
 }
 
-/** Clear */
+/* Clear */
 async function clearTable(tableKey) {
     await AsyncStorage.removeItem(tableKey);
 }
 
-/* ---------- exported wrapper ---------- */
+/* Export All The Functions */
 export const Storage = {
+
     /* Workouts */
     addWorkout: (w) => addItem(WORKOUTS_KEY, w),
     getWorkouts: () => getItems(WORKOUTS_KEY),
@@ -60,4 +61,5 @@ export const Storage = {
     updateRun: (r) => updateItem(RUNS_KEY, r),
     deleteRun: (id) => deleteItem(RUNS_KEY, id),
     clearRuns: () => clearTable(RUNS_KEY),
+
 };

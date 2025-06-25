@@ -10,8 +10,8 @@ export default function SettingsPage() {
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { triggerRefresh } = useRefresh();
 
-    const backgroundColor = isDarkMode ? '#000' : '#fff';
-    const textColor = isDarkMode ? '#fff' : '#000';
+    const backgroundColor = isDarkMode ? 'black' : 'white';
+    const textColor = isDarkMode ? 'white' : 'black';
 
     const [alertVisible, setAlertVisible] = useState(false);
 
@@ -31,7 +31,7 @@ export default function SettingsPage() {
 
             <Text style={[styles.title, { color: textColor }]}>Settings Page</Text>
 
-            {/* Appearance Section */}
+            {/* Appearance section */}
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>Appearance</Text>
                 <View style={styles.optionRow}>
@@ -45,7 +45,7 @@ export default function SettingsPage() {
                 </View>
             </View>
 
-            {/* App Info Section */}
+            {/* App info section */}
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>App Info</Text>
                 <View style={styles.infoRow}>
@@ -71,20 +71,20 @@ export default function SettingsPage() {
                 style={styles.logo}
             />
 
-            {/* Reset App Data */}
+            {/* Reset app */}
             <CustomButton
                 title="Reset App Data"
                 onPress={() => setAlertVisible(true)}
-                backgroundColor="#D32F2F"
-                color="#fff"
+                backgroundColor="red"
+                color="white"
                 style={styles.resetButton}
             />
 
-            {/* Confirmation Alert */}
+            {/* Alert */}
             <CustomAlert
                 visible={alertVisible}
                 title="Confirm Reset"
-                message="You have reset the app successfully!"
+                message="You have reseted the app successfully!"
                 onClose={handleResetApp}
             />
         </View>

@@ -18,42 +18,28 @@ export default function HomePage() {
     const { refreshFlag, triggerRefresh } = useRefresh();
     const { isDarkMode } = useTheme();
 
+    const backgroundColor = isDarkMode ? 'black' : 'white';
+    const textColor = isDarkMode ? 'white' : 'black';
+
     const [items, setItems] = useState([]);
-    const [refresh, setRefresh] = useState(false);
+    const [refresh, setRefresh] = useState(false); /////////////////////////////
 
     const [addNewItemVisible, setAddNewItemVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const backgroundColor = isDarkMode ? 'black' : 'white';
-    const textColor = isDarkMode ? 'white' : 'black';
-
-    /* -------- fetch combined list -------- */
+    /* Both workouts and runs */
     async function fetchAll() {
         const workouts = await Storage.getWorkouts();
         const runs = await Storage.getRuns();
         setItems([...workouts, ...runs]);
     }
 
+    /* After a refresh */
     useEffect(() => {
         fetchAll();
-    }, [refresh, refreshFlag]);
+    }, [refresh, refreshFlag]); /////////////////////////////
 
-    /* -------- callbacks -------- */
-    async function deleteAll() {
-        await Storage.clearWorkouts();
-        await Storage.clearRuns();
-        setRefresh(r => !r);
-        triggerRefresh();
-    }
-
-    function handleNewItemAdded() {
-        setAddNewItemVisible(false);
-        setRefresh(r => !r);
-        triggerRefresh();
-    }
-
-    /* -------- render -------- */
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <StatusBar
@@ -63,7 +49,7 @@ export default function HomePage() {
 
             <Text style={[styles.title, { color: textColor }]}>Home Page</Text>
 
-            {/* SCROLLING LIST */}
+            {/* Scrolling list */}
             <ScrollView
                 style={[styles.scrollContainer, { borderColor: textColor }]}
                 contentContainerStyle={styles.scrollContent}
@@ -90,7 +76,7 @@ export default function HomePage() {
                 )}
             </ScrollView>
 
-            {/* BUTTONS ROW */}
+            {/* Button */}
             <View style={styles.buttonRow}>
                 <CustomButton
                     title="Add An Item"
@@ -102,8 +88,13 @@ export default function HomePage() {
             </View>
 
             {/* POP-UPS */}
-            <NewItemPopup visible={addNewItemVisible} onClose={handleNewItemAdded} />
-
+            <NewItemPopup visible={addNewItemVisible} onClose={refreshNeeded => {
+                setAddNewItemVisible(false);
+                if (refreshNeeded) {
+                    setRefresh(r => !r); /////////////////////////////
+                    triggerRefresh();
+                }
+            }} />
             <ItemPopup
                 visible={editVisible}
                 initialData={selectedItem}
@@ -111,7 +102,7 @@ export default function HomePage() {
                     setEditVisible(false);
                     setSelectedItem(null);
                     if (refreshNeeded) {
-                        fetchAll();
+                        setRefresh(r => !r); /////////////////////////////
                         triggerRefresh();
                     }
                 }}
@@ -120,7 +111,6 @@ export default function HomePage() {
     );
 }
 
-/* ---------------- styles ---------------- */
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -140,6 +130,7 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         padding: 20,
         marginTop: 10,
+        borderRadius: 20
     },
     scrollContent: { paddingBottom: 30 },
     rowText: {
@@ -147,6 +138,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         padding: 10,
         marginBottom: 10,
+        borderRadius: 10
     },
     noItems: {
         fontSize: 30,

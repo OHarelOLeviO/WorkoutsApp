@@ -17,7 +17,6 @@ import { Storage } from '../utils/storage';
 import CustomAlert from '../components/CustomAlert';
 import Icon from 'react-native-vector-icons/Feather';
 
-/* ---------- helpers ---------- */
 const ddMMyyyyToDate = str => {
     const [d, m, y] = str.split('/').map(Number);
     return new Date(y, m - 1, d);
@@ -29,11 +28,10 @@ const formatDuration = secs => {
     return `${h}:${m}:${s}`;
 };
 
-/* ---------- main component ---------- */
 const ItemPopup = ({ visible, onClose, initialData = null }) => {
+
     const isEditing = initialData !== null;
 
-    /* ----- state ----- */
     const [itemType, setItemType] = useState(initialData?.type ?? 'run');
     const [name, setName] = useState(initialData?.name ?? '');
     const [date, setDate] = useState(
@@ -41,27 +39,23 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
     );
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    // run fields
     const [distance, setDistance] = useState(initialData?.distance ?? '');
     const [durationSecs, setDurationSecs] = useState(
         initialData?.durationSecs ?? 0
     );
     const [showDurationPicker, setShowDurationPicker] = useState(false);
 
-    // workout fields
     const [exercises, setExercises] = useState(
         initialData?.exercises ?? [{ name: '', reps: '', weight: '' }]
     );
 
-    // alerts
     const [alertVisible, setAlertVisible] = useState(false);
     const [alertTitle, setAlertTitle] = useState('');
     const [alertMessage, setAlertMessage] = useState('');
     const okCallback = useRef(() => { });
 
-    /* ----- sync state when a new item is passed in ----- */
     useEffect(() => {
-        if (!visible) return; // avoid state churn when modal closes
+        if (!visible) return;
         if (initialData) {
             setItemType(initialData.type);
             setName(initialData.name);
@@ -76,7 +70,6 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
         }
     }, [initialData, visible]);
 
-    /* ----- utils ----- */
     const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(
         date.getMonth() + 1
     )
@@ -99,21 +92,20 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
         setExercises([{ name: '', reps: '', weight: '' }]);
     };
 
-    /* ----- exercise helpers ----- */
     const addExercise = () =>
         setExercises([...exercises, { name: '', reps: '', weight: '' }]);
+
     const deleteExercise = idx =>
         setExercises(exercises.filter((_, i) => i !== idx));
+
     const updateExercise = (idx, field, v) =>
         setExercises(
             exercises.map((ex, i) => (i === idx ? { ...ex, [field]: v } : ex))
         );
 
-    /* ----- SAVE (add or update) ----- */
     const handleSave = async () => {
         try {
             if (itemType === 'run') {
-                // validation
                 if (!name.trim()) return showAlert('Missing Name', 'Enter a name.');
                 if (!distance.trim())
                     return showAlert('Missing Distance', 'Enter the distance.');
@@ -136,12 +128,13 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                     await Storage.addRun(runObj);
                 }
             } else {
-                // workout validation
                 if (!name.trim())
                     return showAlert('Missing Name', 'Enter a workout name.');
+
                 const allValid = exercises.every(
                     ex => ex.name.trim() && ex.reps.trim() && ex.weight.trim()
                 );
+
                 if (!allValid)
                     return showAlert(
                         'Incomplete Exercise',
@@ -165,11 +158,10 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
 
             showAlert(
                 isEditing ? 'Item Updated!' : 'Item Saved!',
-                `${name.trim() || (itemType === 'run' ? 'Run' : 'Workout')} ${isEditing ? 'updated' : 'saved'
-                } successfully.`,
+                `${name.trim()} ${isEditing ? 'updated' : 'saved'} successfully.`,
                 () => {
                     resetState();
-                    onClose(true); // true → refresh parent list
+                    onClose(true);
                 }
             );
         } catch (err) {
@@ -178,7 +170,6 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
         }
     };
 
-    /* ----- DELETE ----- */
     const handleDelete = async () => {
         if (!initialData) return;
         try {
@@ -194,7 +185,6 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
         }
     };
 
-    /* ----- render ----- */
     return (
         <Modal visible={visible} transparent animationType="fade">
             <View style={styles.overlay}>
@@ -204,7 +194,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             {isEditing ? 'Edit Item' : 'Add A New Item'}
                         </Text>
 
-                        {/* TYPE SELECT */}
+                        {/* Type selection */}
                         {!isEditing ? (
                             <View style={styles.typeRow}>
                                 <Pressable
@@ -237,7 +227,9 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             </View>
                         )}
 
-                        {/* COMMON FIELDS */}
+                        {/* Common fields */}
+
+                        {/* Name */}
                         <TextInput
                             style={styles.input}
                             placeholder={
@@ -247,7 +239,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             onChangeText={setName}
                         />
 
-                        {/* DATE */}
+                        {/* Date */}
                         <Pressable onPress={() => setShowDatePicker(true)}>
                             <TextInput
                                 style={styles.input}
@@ -267,7 +259,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             />
                         )}
 
-                        {/* RUN-ONLY */}
+                        {/* Run fields */}
                         {itemType === 'run' && (
                             <>
                                 <TextInput
@@ -278,7 +270,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                                     onChangeText={setDistance}
                                 />
 
-                                {/* Duration */}
+                                {/* Duration (HH:MM:SS) */}
                                 <Pressable onPress={() => setShowDurationPicker(true)}>
                                     <TextInput
                                         style={styles.input}
@@ -299,7 +291,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             </>
                         )}
 
-                        {/* WORKOUT-ONLY */}
+                        {/* Workout fields */}
                         {itemType === 'workout' && (
                             <>
                                 {exercises.map((ex, idx) => (
@@ -338,7 +330,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                             </>
                         )}
 
-                        {/* ACTION BUTTONS */}
+                        {/* Action buttons */}
                         <View style={styles.buttonBar}>
                             <Button title="Save" onPress={handleSave} />
                             {isEditing && (
@@ -355,7 +347,7 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
                         </View>
                     </ScrollView>
 
-                    {/* Alert */}
+                    {/* Custom alert */}
                     <CustomAlert
                         visible={alertVisible}
                         title={alertTitle}
@@ -371,7 +363,6 @@ const ItemPopup = ({ visible, onClose, initialData = null }) => {
     );
 };
 
-/* ---------- styles ---------- */
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
