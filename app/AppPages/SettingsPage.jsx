@@ -5,6 +5,7 @@ import { Storage } from '../utils/storage.js';
 import CustomButton from '../components/CustomButton.jsx';
 import CustomAlert from '../components/CustomAlert.jsx';
 import { useRefresh } from '../Contexts/RefreshContext.jsx';
+import * as Speech from 'expo-speech';
 
 export default function SettingsPage() {
     const { isDarkMode, toggleDarkMode } = useTheme();
@@ -74,7 +75,10 @@ export default function SettingsPage() {
             {/* Reset app */}
             <CustomButton
                 title="Reset App Data"
-                onPress={() => setAlertVisible(true)}
+                onPress={() => {
+                    setAlertVisible(true);
+                    Speech.speak("The app has been successfully reset");
+                }}
                 backgroundColor="red"
                 color="white"
                 style={styles.resetButton}
@@ -84,7 +88,7 @@ export default function SettingsPage() {
             <CustomAlert
                 visible={alertVisible}
                 title="Confirm Reset"
-                message="You have reseted the app successfully!"
+                message="You have reset the app successfully!"
                 onClose={handleResetApp}
             />
         </View>
